@@ -13,10 +13,10 @@
 ## 開發
 
 ```sh
-npm install
-npm run dev       # 開發伺服器
-npm run build     # 型別檢查 + 打包到 dist/
-npm run preview   # 預覽打包結果
+pnpm install
+pnpm dev          # 開發伺服器
+pnpm build        # 型別檢查 + 打包到 dist/
+pnpm preview      # 預覽打包結果
 ```
 
 `dist/` 為純靜態檔案（相對路徑），可直接部署到任何靜態主機。
