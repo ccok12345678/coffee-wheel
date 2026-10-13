@@ -1,0 +1,72 @@
+import type { Lang } from './data/flavors';
+
+export const htmlLang: Record<Lang, string> = { zh: 'zh-Hant-TW', en: 'en' };
+
+const strings = {
+  zh: {
+    title: '咖啡風味輪',
+    subtitle: '從內圈的大分類出發，一步步找到杯中更細緻的風味。',
+    docTitle: '咖啡風味輪 · 風味選擇器',
+    language: '語言',
+    themeToDark: '切換為深色模式',
+    themeToLight: '切換為淺色模式',
+    wheelLabel: '咖啡風味輪。點選分類展開，點選風味加入筆記。',
+    wheelHintRoot: '點選分類展開',
+    wheelHintBack: '點此返回',
+    breadcrumb: '目前位置',
+    levelHeading: (name: string) => `${name}`,
+    levelCount: (n: number) => `${n} 個項目`,
+    pickGeneral: (name: string) => `選擇「${name}」作為整體風味`,
+    pickedGeneral: (name: string) => `已選擇「${name}」`,
+    goDeeper: (name: string) => `展開 ${name}`,
+    flavorCount: (n: number) => `${n} 種`,
+    notesTitle: '我的風味筆記',
+    notesEmpty: '還沒有選擇風味。點選風味輪最外圈，或從上方清單挑選。',
+    remove: (name: string) => `移除 ${name}`,
+    copy: '複製文字',
+    copied: '已複製',
+    clear: '全部清除',
+    separator: '、',
+    selectedSummary: (n: number) => `已選 ${n} 種風味`,
+    viewNotes: '查看筆記',
+    footer: '風味分類參考 SCA / WCR Coffee Taster’s Flavor Wheel。',
+    announceAdd: (name: string) => `已加入 ${name}`,
+    announceRemove: (name: string) => `已移除 ${name}`,
+  },
+  en: {
+    title: 'Coffee Flavor Wheel',
+    subtitle: 'Start from the broad categories at the centre and work outward to the finer notes in your cup.',
+    docTitle: 'Coffee Flavor Wheel · Flavor Picker',
+    language: 'Language',
+    themeToDark: 'Switch to dark theme',
+    themeToLight: 'Switch to light theme',
+    wheelLabel: 'Coffee flavor wheel. Tap a category to expand it, tap a flavor to add it to your notes.',
+    wheelHintRoot: 'Tap a category',
+    wheelHintBack: 'Tap to go back',
+    breadcrumb: 'Current level',
+    levelHeading: (name: string) => name,
+    levelCount: (n: number) => `${n} ${n === 1 ? 'item' : 'items'}`,
+    pickGeneral: (name: string) => `Pick “${name}” as a general note`,
+    pickedGeneral: (name: string) => `“${name}” picked`,
+    goDeeper: (name: string) => `Expand ${name}`,
+    flavorCount: (n: number) => `${n}`,
+    notesTitle: 'My tasting notes',
+    notesEmpty: 'No flavors picked yet. Tap the outer ring of the wheel, or choose from the list above.',
+    remove: (name: string) => `Remove ${name}`,
+    copy: 'Copy text',
+    copied: 'Copied',
+    clear: 'Clear all',
+    separator: ', ',
+    selectedSummary: (n: number) => `${n} ${n === 1 ? 'flavor' : 'flavors'} picked`,
+    viewNotes: 'View notes',
+    footer: 'Flavor categories based on the SCA / WCR Coffee Taster’s Flavor Wheel.',
+    announceAdd: (name: string) => `Added ${name}`,
+    announceRemove: (name: string) => `Removed ${name}`,
+  },
+} satisfies Record<Lang, Record<string, unknown>>;
+
+export type Strings = (typeof strings)['zh'];
+
+export function getStrings(lang: Lang): Strings {
+  return strings[lang];
+}

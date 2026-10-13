@@ -1,0 +1,51 @@
+:root {
+  color-scheme: light dark;
+  background-color: #f6efe4;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    background-color: #14100d;
+  }
+}
+
+@supports (color: light-dark(white, black)) {
+  :root {
+    background-color: light-dark(#f6efe4, #14100d);
+  }
+}
+
+/* Manual override: the theme toggle rewrites <meta name="color-scheme">; mirror it onto the property. */
+:root:has(> head > meta[name='color-scheme'][content='light']) {
+  color-scheme: light;
+}
+
+:root:has(> head > meta[name='color-scheme'][content='dark']) {
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

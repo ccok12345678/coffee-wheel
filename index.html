@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      try {
+        document.querySelector('meta[name="color-scheme"]').content =
+          localStorage.getItem('coffee-wheel:color-scheme') ?? 'light dark';
+      } catch {}
+    </script>
+    <meta name="theme-color" content="#f6efe4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#14100d" media="(prefers-color-scheme: dark)" />
+    <meta name="description" content="互動式咖啡風味輪：從內圈分類一路選到外圈的細緻風味。Interactive coffee flavor wheel picker." />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <title>咖啡風味輪 · 風味選擇器</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
