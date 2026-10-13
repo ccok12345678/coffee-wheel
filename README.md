@@ -21,6 +21,10 @@ npm run preview   # 預覽打包結果
 
 `dist/` 為純靜態檔案（相對路徑），可直接部署到任何靜態主機。
 
+## 部署
+
+推送到 `main` 時，`.github/workflows/deploy.yml` 會自動打包並部署到 GitHub Pages（也可在 Actions 頁面手動執行）。首次使用需在 repo 的 Settings → Pages → Build and deployment → Source 選擇「GitHub Actions」。
+
 ## 結構
 
 ```
