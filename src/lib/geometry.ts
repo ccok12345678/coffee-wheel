@@ -7,11 +7,15 @@ export const R_OUTER = 494;
 export const R_CENTER = 130;
 const TAU = Math.PI * 2;
 
-/** The visible window of the wheel: an angular slice (fractions of the full circle) and the zoom depth. */
+/**
+ * The visible window of the wheel: an angular slice (fractions of the full circle), the zoom depth
+ * and how many rings are drawn outward from the centre disc.
+ */
 export interface View {
   x0: number;
   x1: number;
   depth: number;
+  levels: number;
 }
 
 export interface Arc {
@@ -21,8 +25,9 @@ export interface Arc {
   r1: number;
 }
 
-export function viewFor(node: LaidOutNode): View {
-  return { x0: node.x0, x1: node.x1, depth: node.depth };
+/** `maxLevels` caps the rings shown, e.g. to keep a small screen's root view to the main categories. */
+export function viewFor(node: LaidOutNode, maxLevels = Infinity): View {
+  return { x0: node.x0, x1: node.x1, depth: node.depth, levels: Math.min(wheelDepth - node.depth, maxLevels) };
 }
 
 export function lerpView(from: View, to: View, t: number): View {
@@ -30,6 +35,7 @@ export function lerpView(from: View, to: View, t: number): View {
     x0: from.x0 + (to.x0 - from.x0) * t,
     x1: from.x1 + (to.x1 - from.x1) * t,
     depth: from.depth + (to.depth - from.depth) * t,
+    levels: from.levels + (to.levels - from.levels) * t,
   };
 }
 
@@ -37,7 +43,8 @@ const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
 /**
  * Where a node sits for the given view. Rings share the space between the centre disc and the
- * outer edge evenly; nodes without children reach all the way to the outer edge.
+ * outer edge evenly; nodes without children reach all the way to the outer edge, and nodes beyond
+ * the last visible ring are hidden.
  */
 export function arcFor(node: LaidOutNode, view: View): Arc | null {
   const span = view.x1 - view.x0;
@@ -45,11 +52,11 @@ export function arcFor(node: LaidOutNode, view: View): Arc | null {
   const a1 = clamp01((node.x1 - view.x0) / span) * TAU;
   if (a1 - a0 < 1e-4) return null;
 
-  const levels = wheelDepth - view.depth;
+  const levels = view.levels;
   const ring = (R_OUTER - R_CENTER) / levels;
   const t0 = node.depth - 1 - view.depth;
   const t1 = node.children.length > 0 ? t0 + 1 : levels;
-  const r0 = R_CENTER + Math.max(t0, 0) * ring;
+  const r0 = Math.min(R_CENTER + Math.max(t0, 0) * ring, R_OUTER);
   const r1 = Math.min(R_CENTER + Math.max(t1, 0) * ring, R_OUTER);
   if (r1 - r0 < 0.5) return null;
   return { a0, a1, r0, r1 };
@@ -57,7 +64,7 @@ export function arcFor(node: LaidOutNode, view: View): Arc | null {
 
 /** Number of rings shown for a view (rounded while animating). */
 export function visibleLevels(view: View): number {
-  return Math.max(1, Math.round(wheelDepth - view.depth));
+  return Math.max(1, Math.round(view.levels));
 }
 
 /** Ring index (0 = innermost visible ring) of a node in the given view, rounded. */

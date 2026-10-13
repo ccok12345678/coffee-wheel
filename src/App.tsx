@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { LevelPanel } from './components/LevelPanel';
 import { NotesPanel } from './components/NotesPanel';
 import { shared } from './components/shared';
@@ -7,6 +8,7 @@ import { Wheel } from './components/Wheel';
 import { nodesById, wheelRoot, type Lang, type LaidOutNode } from './data/flavors';
 import { getStrings, htmlLang } from './i18n';
 import { useColorScheme, type Scheme } from './lib/colorScheme';
+import { COMPACT_QUERY, useMediaQuery } from './lib/useMediaQuery';
 import { colors, fonts, radii } from './tokens.stylex';
 
 const LANG_KEY = 'coffee-wheel:lang';
@@ -55,6 +57,10 @@ export function App() {
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState('');
   const [notesInView, setNotesInView] = useState(false);
+  // On phones the list and notes start folded away below the wheel.
+  const compact = useMediaQuery(COMPACT_QUERY);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebarCollapsed = compact && !sidebarOpen;
   const notesRef = useRef<HTMLElement>(null);
   const wheelRef = useRef<HTMLDivElement>(null);
 
@@ -97,6 +103,7 @@ export function App() {
   };
 
   const showNotes = () => {
+    if (sidebarCollapsed) flushSync(() => setSidebarOpen(true));
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     notesRef.current?.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' });
     notesRef.current?.focus({ preventScroll: true });
@@ -167,7 +174,22 @@ export function App() {
           </div>
         </div>
 
-        <div {...stylex.props(styles.sidebar)}>
+        {compact && (
+          <button
+            type="button"
+            aria-expanded={sidebarOpen}
+            aria-controls="sidebar"
+            onClick={() => setSidebarOpen((open) => !open)}
+            {...stylex.props(shared.focusable, styles.sidebarToggle)}
+          >
+            {sidebarOpen ? strings.sidebarHide : strings.sidebarShow}
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" {...stylex.props(styles.chevron, sidebarOpen && styles.chevronOpen)}>
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        )}
+
+        <div id="sidebar" {...stylex.props(styles.sidebar, sidebarCollapsed && styles.sidebarCollapsed)}>
           <LevelPanel
             lang={lang}
             strings={strings}
@@ -404,6 +426,41 @@ const styles = stylex.create({
     flexDirection: 'column',
     gap: '16px',
     minWidth: 0,
+  },
+  sidebarCollapsed: {
+    display: 'none',
+  },
+  sidebarToggle: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '6px',
+    minHeight: '44px',
+    paddingInline: '18px',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colors.border,
+    borderRadius: radii.pill,
+    backgroundColor: {
+      default: colors.surfaceSunken,
+      ':hover': colors.surfaceHover,
+    },
+    color: colors.ink,
+    fontSize: '0.9375rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  chevron: {
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 2.2,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    transitionProperty: 'transform',
+    transitionDuration: '200ms',
+  },
+  chevronOpen: {
+    transform: 'rotate(180deg)',
   },
   footer: {
     paddingBlock: '20px 28px',

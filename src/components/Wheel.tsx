@@ -19,6 +19,7 @@ import {
   type View,
 } from '../lib/geometry';
 import { WHEEL_FONT, splitLabel } from '../lib/measureText';
+import { COMPACT_QUERY, useMediaQuery } from '../lib/useMediaQuery';
 import { colors } from '../tokens.stylex';
 
 const ANIMATION_MS = 650;
@@ -38,7 +39,9 @@ export function Wheel({ lang, strings, focus, selected, hoverId, onHover, onActi
   const wrapperRef = useRef<HTMLDivElement>(null);
   const widthPx = useElementWidth(wrapperRef);
   const scale = widthPx / VIEWBOX;
-  const view = useAnimatedView(viewFor(focus));
+  // On phones the root view shows only the main categories until one is tapped.
+  const compact = useMediaQuery(COMPACT_QUERY);
+  const view = useAnimatedView(viewFor(focus, compact && focus.depth === 0 ? 1 : Infinity));
   const hovered = hoverId ? (nodesById.get(hoverId) ?? null) : null;
 
   const levels = visibleLevels(view);
@@ -261,7 +264,7 @@ function useAnimatedView(target: View): View {
 
   useEffect(() => {
     const from = current.current;
-    if (from.x0 === target.x0 && from.x1 === target.x1 && from.depth === target.depth) return;
+    if (from.x0 === target.x0 && from.x1 === target.x1 && from.depth === target.depth && from.levels === target.levels) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced) {
       current.current = target;
@@ -278,7 +281,7 @@ function useAnimatedView(target: View): View {
     });
     return () => cancelAnimationFrame(frame);
     // The target is a fresh object each render; its fields are the real dependencies.
-  }, [target.x0, target.x1, target.depth]);
+  }, [target.x0, target.x1, target.depth, target.levels]);
 
   return view;
 }
